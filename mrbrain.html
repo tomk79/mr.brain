@@ -2,6 +2,87 @@
 require_once( dirname(__FILE__).'/mrbrain.files/php/mecab.php' );
 $mecab = new cont_mecab($px);
 
-test::var_dump($mecab);
+if( strlen( $px->req()->get_param('your_voice') ) ){
+	header('Content-type: text/json');
+	$json = array(
+		'name'=>'Mr.Brain',
+		'answer'=>'こんにちわ！ 「'.$px->req()->get_param('your_voice').'」ですって！',
+		'face_type'=>'',
+	);
+	print t::data2jssrc($json);
+	exit();
+}
 
+?>
+
+<script type="text/javascript">
+var cont = new (function($){
+	var $elmFormOfYou;
+	var $elmYourVoice;
+	var $elmMrBrainsFace;
+	var $elmMrBrainsVoice;
+
+	this.init = function(){
+		$elmFormOfYou = $('form.cont_you');
+		$elmYourVoice = $('form.cont_you input[name=your_voice]');
+		$elmMrBrainsFace = $('.cont_mrbrain .cont_mrbrain-face');
+		$elmMrBrainsVoice = $('.cont_mrbrain .cont_mrbrain-voice');
+		this.resetYou();
+	}
+	this.submit = function(form){
+		var _this = this;
+		var text = $elmYourVoice.val();
+		if( !text.length ){
+			this.resetYou();
+			return false;
+		}
+
+		$.ajax({
+			url:'?',
+			dataType: 'json',
+			data:{
+				your_voice: text
+			},
+			success: function(data){
+				$elmMrBrainsVoice.text(data.answer);
+			},
+			error: function(){
+				$elmMrBrainsVoice.text('ん〜〜？');
+			},
+			complete: function(){
+				_this.resetYou();
+			}
+		});
+		return false;
+	}
+	this.resetYou = function(){
+		$elmYourVoice.val('').focus();
+		return true;
+	}
+})(jQuery);
+</script>
+
+<div class="unit">
+	<div class="cont_mrbrain">
+		<div class="cont_mrbrain-face">
+		</div>
+		<div class="cont_mrbrain-voice">
+		</div>
+	</div>
+
+	<form action="?" method="post" class="cont_you inline" onsubmit="return cont.submit(this);">
+		<p><input type="text" name="your_voice" value="" /><input type="submit" value="発言する" /></p>
+	</form>
+
+</div>
+
+
+
+<script type="text/javascript">
+$(window).load(function(){
+	cont.init();
+});
+</script>
+
+<?php
 ?>
