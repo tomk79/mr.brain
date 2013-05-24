@@ -3,15 +3,15 @@ require_once( dirname(__FILE__).'/mrbrain.files/php/mecab.php' );
 $mecab = new cont_mecab($px);
 
 if( strlen( $px->req()->get_param('your_voice') ) ){
+	$parsed_text = $mecab->parse( $px->req()->get_param('your_voice') );
+
 	header('Content-type: text/json');
-	$json = array(
-		'name'=>'Mr.Brain',
-		'answer'=>'こんにちわ！ 「'.$px->req()->get_param('your_voice').'」ですって！',
-		'face_type'=>'',
-	);
+	$json = t::data2jssrc($parsed_text);
 	print t::data2jssrc($json);
 	exit();
 }
+
+
 
 ?>
 
@@ -44,7 +44,7 @@ var cont = new (function($){
 				your_voice: text
 			},
 			success: function(data){
-				$elmMrBrainsVoice.text(data.answer);
+				$elmMrBrainsVoice.text(data);
 			},
 			error: function(){
 				$elmMrBrainsVoice.text('ん〜〜？');
