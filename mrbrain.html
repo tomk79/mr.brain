@@ -5,8 +5,40 @@ $mecab = new cont_mecab($px);
 if( strlen( $px->req()->get_param('your_voice') ) ){
 	$parsed_text = $mecab->parse( $px->req()->get_param('your_voice') );
 
+	/*
+	To use "say" command on Mac OSX Mountain Lion + MAMP:
+
+	$ vi /Applications/MAMP/Library/bin/envvars
+
+		[Before]
+		if test "x$DYLD_LIBRARY_PATH" != "x" ; then
+		  DYLD_LIBRARY_PATH="/Applications/MAMP/Library/lib:$DYLD_LIBRARY_PATH"
+		else
+		  DYLD_LIBRARY_PATH="/Applications/MAMP/Library/lib"
+		fi
+		export DYLD_LIBRARY_PATH
+
+			↓↓↓↓↓↓
+
+		[After]
+		if test "x$DYLD_LIBRARY_PATH" != "x" ; then
+		#  DYLD_LIBRARY_PATH="/Applications/MAMP/Library/lib:$DYLD_LIBRARY_PATH"
+		else
+		#  DYLD_LIBRARY_PATH="/Applications/MAMP/Library/lib"
+		fi
+		export DYLD_LIBRARY_PATH
+
+	see more: http://d.hatena.ne.jp/lyco/comment?date=20090131
+
+	*/
+	exec('say -v Kyoko "'.addslashes($px->req()->get_param('your_voice')).'"');
+	// test::var_dump($output);
+	// test::var_dump($return);
+
+
 	header('Content-type: text/json');
 	$json = t::data2jssrc($parsed_text);
+
 	print t::data2jssrc($json);
 	exit();
 }
